@@ -1,4 +1,4 @@
-package org.example.repositories.impl;
+package org.example.repositories.impl.json;
 
 import org.example.models.Rental;
 import org.example.repositories.RentalRepository;
@@ -37,7 +37,7 @@ public class RentalJsonRepository implements RentalRepository {
     @Override
     public Optional<Rental> findByVehicleIdAndReturnDateIsNull(String vehicleId) {
         return rentals.stream()
-                .filter(rental -> rental.getVehicleId().equals(vehicleId)
+                .filter(rental -> rental.getId().equals(vehicleId)
                         && rental.getReturnDateTime() == null).findFirst();
     }
 }

@@ -3,11 +3,14 @@ package org.example.services;
 import org.example.models.Vehicle;
 import org.example.models.VehicleValidator;
 import org.example.repositories.VehicleRepository;
+import org.example.services.servicesInterfaces.VehicleServiceInterface;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
-
-public class VehicleService {
+@Service
+public class VehicleService implements VehicleServiceInterface {
     private final VehicleRepository vehicleRepository;
     private final RentalService rentalService;
     private final VehicleValidator vehicleValidator;
@@ -31,6 +34,11 @@ public class VehicleService {
         return rentalService.vehicleHasActiveRental(id);
     }
 
+    @Override
+    public List<Vehicle> findAllVehicles() {
+        return List.of();
+    }
+
     public List<Vehicle> findAvailableVehicles() {
         return vehicleRepository.findAll().stream()
                 .filter(v -> !isVehicleRented(v.getId()))
@@ -38,6 +46,9 @@ public class VehicleService {
     }
 
     public Vehicle addVehicle(Vehicle vehicle) {
+        if(vehicle.getId() == null || vehicle.getId().trim().isEmpty()){
+            vehicle.setId(UUID.randomUUID().toString());
+        }
         vehicleValidator.validate(vehicle);
         return vehicleRepository.save(vehicle);
     }

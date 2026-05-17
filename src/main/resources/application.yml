@@ -1,0 +1,7 @@
+spring:
+  profiles:
+    active: jpa
+  main:
+    banner-mode: off
+server:
+  port: 5000

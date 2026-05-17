@@ -1,6 +1,5 @@
 package org.example;
 
-
 import org.example.models.*;
 import org.example.services.*;
 
@@ -12,7 +11,7 @@ public class UI {
 
     private final AuthService authService;
     private final VehicleService vehicleService;
-    private final RentalService rentalService;
+    private final RentalService rentalService; // Jeśli używasz interfejsów, zmień tu typ na RentalServiceInterface
     private final UserService userService;
     private final VehicleCategoryConfigService categoryConfigService;
     private final Scanner scanner = new Scanner(System.in);
@@ -69,8 +68,7 @@ public class UI {
             switch (scanner.nextLine().trim()) {
                 case "1" -> vehicleService.findAll().forEach(v ->
                         System.out.println(v +
-                                " [Wypożyczony: " + vehicleService.isVehicleRented(v.getId()) + "]"
-                                + "[Wypożyczony: " +rentalService.vehicleHasActiveRental(v.getId()) + "]"));
+                                " [Wypożyczony: " + vehicleService.isVehicleRented(v.getId()) + "]"));
                 case "2" -> addVehicle();
                 case "3" -> deleteVehicle();
                 case "4" -> showAllUsers();
@@ -199,13 +197,8 @@ public class UI {
 
             rentalService.findActiveRentalByUserId(u.getId())
                     .ifPresentOrElse(
-                            rental -> {
-                                try {
-                                    System.out.println("Aktualnie wypożyczony pojazd: " + vehicleService.findById(rental.getVehicleId()));
-                                } catch (Exception e) {
-                                    System.out.println("Aktualnie wypożyczony pojazd: " + rental.getVehicleId() + " (brak szczegółów)");
-                                }
-                            },
+                            // ZMIANA: Ponieważ Rental ma teraz cały obiekt Vehicle, wystarczy wywołać rental.getVehicle()
+                            rental -> System.out.println("Aktualnie wypożyczony pojazd: " + rental.getVehicle().getBrand() + " " + rental.getVehicle().getModel()),
                             () -> System.out.println("Brak aktywnego wypożyczenia.")
                     );
         } catch (Exception e) {
@@ -274,19 +267,6 @@ public class UI {
 
     private void printRentalDetails(Rental rental) {
         System.out.println(rental);
-
-        String login = "nieznany";
-        try {
-            login = userService.findById(rental.getUserId()).getLogin();
-        } catch (Exception ignored) {}
-
-        String vehicle = "nieznany";
-        try {
-            vehicle = vehicleService.findById(rental.getVehicleId()).toString();
-        } catch (Exception ignored) {}
-
-        System.out.println("  user: " + login);
-        System.out.println("  vehicle: " + vehicle);
         System.out.println("--------------------");
     }
 }

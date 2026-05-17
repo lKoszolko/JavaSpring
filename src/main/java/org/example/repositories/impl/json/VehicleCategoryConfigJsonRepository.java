@@ -1,15 +1,17 @@
-package org.example.repositories.impl;
+package org.example.repositories.impl.json;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.example.models.CategoryConfig;
 import org.example.repositories.VehicleCategoryConfigRepository;
+import org.springframework.stereotype.Repository;
 
 import java.io.FileReader;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
+@Repository
 public class VehicleCategoryConfigJsonRepository implements VehicleCategoryConfigRepository {
     List<CategoryConfig> categories = new ArrayList<>();
 

@@ -2,9 +2,10 @@ package org.example.models;
 
 
 import org.example.services.VehicleCategoryConfigService;
+import org.springframework.stereotype.Component;
 
 import java.util.Map;
-
+@Component
 public class VehicleValidator {
     private final VehicleCategoryConfigService configService;
 
@@ -33,7 +34,7 @@ public class VehicleValidator {
         if (config == null) throw new IllegalArgumentException(
                 "Nieznana kategoria pojazdu: " + vehicle.getCategory());
 
-        Map<String, Object> actualAttrs = vehicle.getAdditionalAttributes();
+        Map<String, Object> actualAttrs = vehicle.getAttributes();
         Map<String, String> expectedAttrs = config.getAttributes();
 
         if (expectedAttrs != null) {

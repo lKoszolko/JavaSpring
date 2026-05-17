@@ -1,0 +1,8 @@
+POST http://localhost:5000/api/users
+Accept: application/json
+
+{
+  "login": "jan_kowalski",
+  "passwordHash": "superTajneHaslo123",
+  "role": "USER"
+}
