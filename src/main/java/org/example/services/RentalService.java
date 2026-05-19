@@ -35,7 +35,6 @@ public class RentalService implements RentalServiceInterface {
     @Override
     public Optional<Rental> findActiveRentalByUserId(String userId) {
         return rentalRepository.findAll().stream()
-                // ZMIANA: Schodzimy w głąb obiektu user
                 .filter(r -> r.getUser().getId().equals(userId) && r.getReturnDateTime() == null)
                 .findFirst();
     }
@@ -43,7 +42,6 @@ public class RentalService implements RentalServiceInterface {
     @Override
     public List<Rental> findUserRentals(String userId) {
         return rentalRepository.findAll().stream()
-                // ZMIANA: Schodzimy w głąb obiektu user
                 .filter(r -> r.getUser().getId().equals(userId))
                 .collect(Collectors.toList());
     }
@@ -65,7 +63,6 @@ public class RentalService implements RentalServiceInterface {
         Vehicle vehicle = vehicleRepository.findById(vehicleId)
                 .orElseThrow(() -> new IllegalArgumentException("Taki pojazd nie istnieje."));
 
-        // DODANE: Pobieramy obiekt User z bazy
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Taki użytkownik nie istnieje."));
 
@@ -76,7 +73,6 @@ public class RentalService implements RentalServiceInterface {
             throw new IllegalStateException("Ten pojazd jest już wypożyczony przez kogoś innego.");
         }
 
-        // ZMIANA: Używamy pełnych obiektów `vehicle` i `user` w konstruktorze
         Rental rental = new Rental(UUID.randomUUID().toString(), vehicle, user, String.valueOf(LocalDateTime.now()), null);
         return rentalRepository.save(rental);
     }

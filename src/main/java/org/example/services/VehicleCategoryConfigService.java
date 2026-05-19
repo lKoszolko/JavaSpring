@@ -2,7 +2,6 @@ package org.example.services;
 
 import org.example.models.CategoryConfig;
 import org.example.repositories.VehicleCategoryConfigRepository;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
