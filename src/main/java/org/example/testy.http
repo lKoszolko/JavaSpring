@@ -1,8 +1,2 @@
-POST http://localhost:5000/api/users
+GET https://car-rental-app-gehk.onrender.com/api/vehicles
 Accept: application/json
-
-{
-  "login": "jan_kowalski",
-  "passwordHash": "superTajneHaslo123",
-  "role": "USER"
-}

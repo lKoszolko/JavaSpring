@@ -10,9 +10,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
-@Profile("jpa")
 @Repository
+@Profile("hibernate")
 @Transactional
 public class VehicleHibernateRepository implements VehicleRepository {
 
@@ -21,7 +22,9 @@ public class VehicleHibernateRepository implements VehicleRepository {
 
     @Override
     public List<Vehicle> findAll() {
-        return entityManager.createQuery("FROM Vehicle", Vehicle.class).getResultList();
+        return entityManager
+                .createQuery("FROM Vehicle", Vehicle.class)
+                .getResultList();
     }
 
     @Override
@@ -31,6 +34,9 @@ public class VehicleHibernateRepository implements VehicleRepository {
 
     @Override
     public Vehicle save(Vehicle vehicle) {
+        if (vehicle.getId() == null || vehicle.getId().isBlank()) {
+            vehicle.setId(UUID.randomUUID().toString());
+        }
         return entityManager.merge(vehicle);
     }
 

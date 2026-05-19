@@ -1,0 +1,8 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://ep-twoj-link-bazy.eu-central-1.aws.neon.tech/neondb
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
