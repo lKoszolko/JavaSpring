@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-@Profile("jpa")
+@Profile({"jpa", "adapter"})
 @Transactional
 public class UserHibernateRepository implements UserRepository {
 

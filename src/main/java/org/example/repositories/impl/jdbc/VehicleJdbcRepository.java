@@ -1,113 +1,157 @@
 package org.example.repositories.impl.jdbc;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import org.example.db.JdbcConnectionManager;
 import org.example.models.Vehicle;
 import org.example.repositories.VehicleRepository;
 import org.springframework.context.annotation.Profile;
+import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.stereotype.Repository;
 
-import java.lang.reflect.Type;
-import java.sql.*;
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-@Profile("jdbc")
+import java.util.UUID;
+
 @Repository
-
+@Profile("jdbc")
 public class VehicleJdbcRepository implements VehicleRepository {
-    private final Gson gson = new Gson();
 
-    @Override
-    public Vehicle save(Vehicle vehicle) {
-        String sql = """
-            INSERT INTO vehicle (id, brand, model, year, plate, price, category, additional_attributes) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?::jsonb)
-            ON CONFLICT (id) DO UPDATE SET 
-                brand = EXCLUDED.brand, model = EXCLUDED.model, year = EXCLUDED.year, 
-                plate = EXCLUDED.plate, price = EXCLUDED.price, category = EXCLUDED.category, 
-                additional_attributes = EXCLUDED.additional_attributes
-            """;
-        try (Connection conn = JdbcConnectionManager.getInstance().getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, vehicle.getId());
-            pstmt.setString(2, vehicle.getBrand());
-            pstmt.setString(3, vehicle.getModel());
-            pstmt.setInt(4, vehicle.getYear());
-            pstmt.setString(5, vehicle.getPlate());
-            pstmt.setDouble(6, vehicle.getPrice());
-            pstmt.setString(7, vehicle.getCategory());
+    private final DataSource dataSource;
 
-            String attributesJson = gson.toJson(vehicle.getAttributes());
-            pstmt.setString(8, attributesJson);
-
-            pstmt.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException("Błąd zapisu pojazdu: " + e.getMessage(), e);
-        }
-        return vehicle;
-    }
-
-    @Override
-    public Optional<Vehicle> findById(String id) {
-        String sql = "SELECT * FROM vehicle WHERE id = ?";
-        try (Connection conn = JdbcConnectionManager.getInstance().getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, id);
-            ResultSet rs = pstmt.executeQuery();
-            if (rs.next()) {
-                return Optional.of(mapResultSetToVehicle(rs));
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        return Optional.empty();
+    public VehicleJdbcRepository(DataSource dataSource) {
+        this.dataSource = dataSource;
     }
 
     @Override
     public List<Vehicle> findAll() {
         List<Vehicle> vehicles = new ArrayList<>();
-        String sql = "SELECT * FROM vehicle";
-        try (Connection conn = JdbcConnectionManager.getInstance().getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+        String sql = "SELECT id, category, brand, model, production_year, plate, price, attributes FROM vehicle";
+
+        Connection connection = DataSourceUtils.getConnection(dataSource);
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
             while (rs.next()) {
-                vehicles.add(mapResultSetToVehicle(rs));
+                vehicles.add(mapRow(rs));
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Error occurred while reading vehicles", e);
+        } finally {
+            DataSourceUtils.releaseConnection(connection, dataSource);
         }
+
         return vehicles;
+    }
+
+    @Override
+    public Optional<Vehicle> findById(String id) {
+        String sql = "SELECT id, category, brand, model, production_year, plate, price, attributes FROM vehicle WHERE id = ?";
+
+        Connection connection = DataSourceUtils.getConnection(dataSource);
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return Optional.of(mapRow(rs));
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error occurred while finding vehicle by id", e);
+        } finally {
+            DataSourceUtils.releaseConnection(connection, dataSource);
+        }
+
+        return Optional.empty();
+    }
+
+    @Override
+    public Vehicle save(Vehicle vehicle) {
+        if (vehicle.getId() == null || vehicle.getId().isBlank()) {
+            vehicle.setId(UUID.randomUUID().toString());
+            insert(vehicle);
+        } else {
+            if (findById(vehicle.getId()).isPresent()) {
+                update(vehicle);
+            } else {
+                insert(vehicle);
+            }
+        }
+        return vehicle;
     }
 
     @Override
     public void deleteById(String id) {
         String sql = "DELETE FROM vehicle WHERE id = ?";
-        try (Connection conn = JdbcConnectionManager.getInstance().getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, id);
-            pstmt.executeUpdate();
+
+        Connection connection = DataSourceUtils.getConnection(dataSource);
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, id);
+            stmt.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Error occurred while deleting vehicle", e);
+        } finally {
+            DataSourceUtils.releaseConnection(connection, dataSource);
         }
     }
 
-    private Vehicle mapResultSetToVehicle(ResultSet rs) throws SQLException {
-        String attributesJson = rs.getString("additional_attributes");
-        Type type = new TypeToken<Map<String, Object>>(){}.getType();
-        Map<String, Object> attributes = gson.fromJson(attributesJson, type);
+    private void insert(Vehicle vehicle) {
+        String sql = "INSERT INTO vehicle (id, category, brand, model, production_year, plate, price, attributes) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        Connection connection = DataSourceUtils.getConnection(dataSource);
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            setStatementParameters(stmt, vehicle);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Error occurred while inserting vehicle", e);
+        } finally {
+            DataSourceUtils.releaseConnection(connection, dataSource);
+        }
+    }
 
-        return Vehicle.builder()
-                .id(rs.getString("id"))
-                .brand(rs.getString("brand"))
-                .model(rs.getString("model"))
-                .year(rs.getInt("year"))
-                .plate(rs.getString("plate"))
-                .price(rs.getDouble("price"))
-                .category(rs.getString("category"))
-                .attributes(attributes)
-                .build();
+    private void update(Vehicle vehicle) {
+        String sql = "UPDATE vehicle SET category = ?, brand = ?, model = ?, production_year = ?, plate = ?, price = ?, attributes = ? WHERE id = ?";
+        Connection connection = DataSourceUtils.getConnection(dataSource);
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, vehicle.getCategory());
+            stmt.setString(2, vehicle.getBrand());
+            stmt.setString(3, vehicle.getModel());
+            stmt.setInt(4, vehicle.getYear());
+            stmt.setString(5, vehicle.getPlate());
+            stmt.setDouble(6, vehicle.getPrice());
+            stmt.setString(7, vehicle.getAttributes().toString());
+            stmt.setString(8, vehicle.getId());
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Error occurred while updating vehicle", e);
+        } finally {
+            DataSourceUtils.releaseConnection(connection, dataSource);
+        }
+    }
+
+    private void setStatementParameters(PreparedStatement stmt, Vehicle vehicle) throws SQLException {
+        stmt.setString(1, vehicle.getId());
+        stmt.setString(2, vehicle.getCategory());
+        stmt.setString(3, vehicle.getBrand());
+        stmt.setString(4, vehicle.getModel());
+        stmt.setInt(5, vehicle.getYear());
+        stmt.setString(6, vehicle.getPlate());
+        stmt.setDouble(7, vehicle.getPrice());
+        stmt.setString(8, vehicle.getAttributes().toString());
+    }
+
+    private Vehicle mapRow(ResultSet rs) throws SQLException {
+        Vehicle vehicle = new Vehicle();
+        vehicle.setId(rs.getString("id"));
+        vehicle.setCategory(rs.getString("category"));
+        vehicle.setBrand(rs.getString("brand"));
+        vehicle.setModel(rs.getString("model"));
+        vehicle.setYear(rs.getInt("production_year"));
+        vehicle.setPlate(rs.getString("plate"));
+        vehicle.setPrice(rs.getDouble("price"));
+        return vehicle;
     }
 }

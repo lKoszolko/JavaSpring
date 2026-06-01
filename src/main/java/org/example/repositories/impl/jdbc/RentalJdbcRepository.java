@@ -14,6 +14,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
 @Profile("jdbc")
 @Repository
 public class RentalJdbcRepository implements RentalRepository {
@@ -37,7 +38,6 @@ public class RentalJdbcRepository implements RentalRepository {
         try (Connection conn = JdbcConnectionManager.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, rental.getId());
-            // ZMIANA: Wyciągamy ID z obiektów
             pstmt.setString(2, rental.getVehicle().getId());
             pstmt.setString(3, rental.getUser().getId());
             pstmt.setString(4, rental.getRentDateTime());
@@ -96,7 +96,6 @@ public class RentalJdbcRepository implements RentalRepository {
 
     @Override
     public Optional<Rental> findByVehicleIdAndReturnDateIsNull(String vehicleId) {
-        // NAPRAWIONE: Dodana implementacja zapytania SQL
         String sql = "SELECT * FROM rental WHERE vehicle_id = ? AND return_date IS NULL";
         try (Connection conn = JdbcConnectionManager.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -112,7 +111,6 @@ public class RentalJdbcRepository implements RentalRepository {
     }
 
     private Rental mapResultSetToRental(ResultSet rs) throws SQLException {
-        // ZMIANA: Pobieramy pełne obiekty z innych repozytoriów na podstawie ID z bazy
         String vehicleId = rs.getString("vehicle_id");
         String userId = rs.getString("user_id");
 

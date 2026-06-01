@@ -6,7 +6,6 @@ import org.example.models.Vehicle;
 import org.example.repositories.VehicleRepository;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,7 +13,6 @@ import java.util.UUID;
 
 @Repository
 @Profile("hibernate")
-@Transactional
 public class VehicleHibernateRepository implements VehicleRepository {
 
     @PersistenceContext

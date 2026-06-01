@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: jpa
+    active: adapter
   main:
     banner-mode: off
 server:
