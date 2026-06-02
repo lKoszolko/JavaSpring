@@ -60,8 +60,7 @@ public class UserJdbcRepository implements UserRepository {
                         rs.getString("id"),
                         rs.getString("login"),
                         rs.getString("password"),
-                        Role.valueOf(rs.getString("role")),
-            null
+                        Role.valueOf(rs.getString("role"))
                 ));
             }
         } catch (SQLException e) {
@@ -82,8 +81,7 @@ public class UserJdbcRepository implements UserRepository {
                         rs.getString("id"),
                         rs.getString("login"),
                         rs.getString("password"),
-                        Role.valueOf(rs.getString("role")),
-                        null
+                        Role.valueOf(rs.getString("role"))
                 ));
             }
         } catch (SQLException e) {

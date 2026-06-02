@@ -27,7 +27,7 @@ public class AuthService implements AuthServiceInterface {
         }
         Role assignedRole = login.equalsIgnoreCase("admin") ? Role.ADMIN : Role.USER;
         String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
-        User newUser = new User(UUID.randomUUID().toString(),login, hashedPassword, Role.USER, null);
+        User newUser = new User(UUID.randomUUID().toString(),login, hashedPassword, Role.USER);
         userRepository.save(newUser);
         return true;
     }

@@ -27,7 +27,6 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
-    private String rentedVehicleId;
 
 
     public User copy() {
@@ -36,7 +35,6 @@ public class User {
                 .login(login)
                 .password(password)
                 .role(role)
-                .rentedVehicleId(rentedVehicleId)
                 .build();
     }
 }

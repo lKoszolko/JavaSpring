@@ -5,3 +5,6 @@ spring:
     banner-mode: off
 server:
   port: 5000
+jwt:
+  secret: 5Sy1-R-Zj7ajgcabswkEttARiS8Q4Vs9IhYCVAt1bQ0
+  expiration: 3600000
