@@ -10,4 +10,4 @@ FROM eclipse-temurin:17-jre-jammy
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 EXPOSE 5000
-ENTRYPOINT ["java", "-jar", "app.jar", "--spring.profiles.active=jpa"]
+ENTRYPOINT ["java", "-jar", "app.jar", "--spring.profiles.active=adapter"]
