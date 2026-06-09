@@ -1,14 +1,17 @@
-POST https://car-rental-app-gehk.onrender.com/api/admin/vehicles
+POST https://car-rental-app-gehk.onrender.com/api/vehicles
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiUk9MRV9BRE1JTiIsInN1YiI6ImFkbWluIiwiaWF0IjoxNzgxMDE2Njk4LCJleHAiOjE3ODEwMjAyOTh9.q5Z9sp_OVMA-D3UskrvQghk0u8oyAWX-5dPUR0VQxko
 Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiUk9MRV9BRE1JTiIsInN1YiI6ImFkbWluIiwiaWF0IjoxNzgxMDE2MjMwLCJleHAiOjE3ODEwMTk4MzB9.QaYvj-t77IhNNuB_KXUMV-FEWHw5sTF0Lnf8YVIqEho
+
 
 {
-  "model": "X5",
-  "attributes": "{}",
-  "brand": "BMW",
-  "category": "Car",
-  "plate": "LU12345",
-  "price": 100,
-  "year": 2020,
-  "id": "123"
+  "category": "",
+  "brand": "Toyota007",
+  "model": "Corolla007",
+  "year": 2007,
+  "plate": "LU007",
+  "price": 157.0,
+  "attributes": {
+    "fuelType":"hybrid"
+  }
+
 }
