@@ -1,7 +1,4 @@
-DELETE https://car-rental-app-gehk.onrender.com/api/vehicles/2aaa462d-2a86-44d0-8ea1-c516708b6903
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiUk9MRV9BRE1JTiIsInN1YiI6ImFkbWluIiwiaWF0IjoxNzgxMDE4ODQ1LCJleHAiOjE3ODEwMjI0NDV9.3hJVTNc7ctZC3K30GrBC2zzLSPHwRLlVTBscPM_vWwc
+DELETE http://localhost:5000/api/vehicles/eaaa393a-e012-4da0-825e-e65de402fa61
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiUk9MRV9BRE1JTiIsInN1YiI6ImFkbWluIiwiaWF0IjoxNzgxMDM2NjIwLCJleHAiOjE3ODEwNDAyMjB9.goLoEHgGfLO6P_AR5YnEzKReIuZTQO1Czt56FWwOqtU
 Content-Type: application/json
 
-{
-
-}

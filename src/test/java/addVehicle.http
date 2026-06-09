@@ -1,7 +1,15 @@
-POST car-rental-app-gehk.onrender.com/api/vehicles
+POST http://localhost:5000/api/vehicles
 Content-Type: application/json
-Authorization: Bearer yJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiUk9MRV9BRE1JTiIsInN1YiI6ImFkbWluIiwiaWF0IjoxNzgxMDE0NDMyLCJleHAiOjE3ODEwMTgwMzJ9.qu-95U26xX37_WdD2EwzlnZRZyOhlNQMsCcg8CdRBkg
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiUk9MRV9BRE1JTiIsInN1YiI6ImFkbWluIiwiaWF0IjoxNzgxMDMyMTI3LCJleHAiOjE3ODEwMzU3Mjd9.koK6-i_xMTZgF64ggj9YxWVtK-SjgBa1p7nT5HJcI08
 
 {
-
+  "category": "Car",
+  "brand": "Toyota007",
+  "model": "Corolla007",
+  "year": 2007,
+  "plate": "LU007",
+  "price": 157.0,
+  "attributes": {
+    "fuelType":"hybrid"
+  }
 }

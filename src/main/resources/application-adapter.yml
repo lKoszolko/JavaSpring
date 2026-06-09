@@ -1,7 +1,7 @@
 spring:
   datasource:
-    url: ${DB_URL}
+    url: jdbc:postgresql://ep-rapid-grass-alrtxlr1-pooler.c-3.eu-central-1.aws.neon.tech/neondb?user=neondb_owner&password=npg_AB5mvuKgao2F&sslmode=require&channelBinding=require
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update

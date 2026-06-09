@@ -1,5 +1,8 @@
 package org.example.repositories.impl.jdbc;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.models.Vehicle;
 import org.example.repositories.VehicleRepository;
 import org.springframework.context.annotation.Profile;
@@ -7,12 +10,10 @@ import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -21,21 +22,22 @@ import java.util.UUID;
 public class VehicleJdbcRepository implements VehicleRepository {
 
     private final DataSource dataSource;
+    // Narzędzie, które perfekcyjnie tłumaczy obiekty Javy na format JSON i z powrotem
+    private final ObjectMapper objectMapper;
 
     public VehicleJdbcRepository(DataSource dataSource) {
         this.dataSource = dataSource;
+        this.objectMapper = new ObjectMapper();
     }
 
     @Override
     public List<Vehicle> findAll() {
         List<Vehicle> vehicles = new ArrayList<>();
-        String sql = "SELECT id, category, brand, model, production_year, plate, price, attributes FROM vehicle";
+        String sql = "SELECT id, category, brand, model, year, plate, price, attributes FROM vehicle";
 
         Connection connection = DataSourceUtils.getConnection(dataSource);
-
         try (PreparedStatement stmt = connection.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
-
             while (rs.next()) {
                 vehicles.add(mapRow(rs));
             }
@@ -44,13 +46,12 @@ public class VehicleJdbcRepository implements VehicleRepository {
         } finally {
             DataSourceUtils.releaseConnection(connection, dataSource);
         }
-
         return vehicles;
     }
 
     @Override
     public Optional<Vehicle> findById(String id) {
-        String sql = "SELECT id, category, brand, model, production_year, plate, price, attributes FROM vehicle WHERE id = ?";
+        String sql = "SELECT id, category, brand, model, year, plate, price, attributes FROM vehicle WHERE id = ?";
 
         Connection connection = DataSourceUtils.getConnection(dataSource);
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -65,7 +66,6 @@ public class VehicleJdbcRepository implements VehicleRepository {
         } finally {
             DataSourceUtils.releaseConnection(connection, dataSource);
         }
-
         return Optional.empty();
     }
 
@@ -87,7 +87,6 @@ public class VehicleJdbcRepository implements VehicleRepository {
     @Override
     public void deleteById(String id) {
         String sql = "DELETE FROM vehicle WHERE id = ?";
-
         Connection connection = DataSourceUtils.getConnection(dataSource);
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, id);
@@ -100,7 +99,7 @@ public class VehicleJdbcRepository implements VehicleRepository {
     }
 
     private void insert(Vehicle vehicle) {
-        String sql = "INSERT INTO vehicle (id, category, brand, model, production_year, plate, price, attributes) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO vehicle (id, category, brand, model, year, plate, price, attributes) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         Connection connection = DataSourceUtils.getConnection(dataSource);
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             setStatementParameters(stmt, vehicle);
@@ -113,7 +112,7 @@ public class VehicleJdbcRepository implements VehicleRepository {
     }
 
     private void update(Vehicle vehicle) {
-        String sql = "UPDATE vehicle SET category = ?, brand = ?, model = ?, production_year = ?, plate = ?, price = ?, attributes = ? WHERE id = ?";
+        String sql = "UPDATE vehicle SET category = ?, brand = ?, model = ?, year = ?, plate = ?, price = ?, attributes = ? WHERE id = ?";
         Connection connection = DataSourceUtils.getConnection(dataSource);
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, vehicle.getCategory());
@@ -122,10 +121,13 @@ public class VehicleJdbcRepository implements VehicleRepository {
             stmt.setInt(4, vehicle.getYear());
             stmt.setString(5, vehicle.getPlate());
             stmt.setDouble(6, vehicle.getPrice());
-            stmt.setString(7, vehicle.getAttributes().toString());
+
+            String jsonAttributes = objectMapper.writeValueAsString(vehicle.getAttributes());
+            stmt.setObject(7, jsonAttributes, java.sql.Types.OTHER);
+
             stmt.setString(8, vehicle.getId());
             stmt.executeUpdate();
-        } catch (SQLException e) {
+        } catch (SQLException | JsonProcessingException e) {
             throw new RuntimeException("Error occurred while updating vehicle", e);
         } finally {
             DataSourceUtils.releaseConnection(connection, dataSource);
@@ -140,7 +142,13 @@ public class VehicleJdbcRepository implements VehicleRepository {
         stmt.setInt(5, vehicle.getYear());
         stmt.setString(6, vehicle.getPlate());
         stmt.setDouble(7, vehicle.getPrice());
-        stmt.setString(8, vehicle.getAttributes().toString());
+
+        try {
+            String jsonAttributes = objectMapper.writeValueAsString(vehicle.getAttributes());
+            stmt.setObject(8, jsonAttributes, java.sql.Types.OTHER);
+        } catch (JsonProcessingException e) {
+            throw new SQLException("Failed to convert attributes to JSON", e);
+        }
     }
 
     private Vehicle mapRow(ResultSet rs) throws SQLException {
@@ -149,9 +157,21 @@ public class VehicleJdbcRepository implements VehicleRepository {
         vehicle.setCategory(rs.getString("category"));
         vehicle.setBrand(rs.getString("brand"));
         vehicle.setModel(rs.getString("model"));
-        vehicle.setYear(rs.getInt("production_year"));
+        vehicle.setYear(rs.getInt("year"));
         vehicle.setPlate(rs.getString("plate"));
         vehicle.setPrice(rs.getDouble("price"));
+
+        String attributesJson = rs.getString("attributes");
+        if (attributesJson != null && !attributesJson.isBlank()) {
+            try {
+                Map<String, Object> attributesMap = objectMapper.readValue(attributesJson, new TypeReference< >() {
+                });
+                attributesMap.forEach(vehicle::addAttribute);
+            } catch (JsonProcessingException e) {
+                throw new SQLException("Failed to parse attributes JSON from database", e);
+            }
+        }
+
         return vehicle;
     }
 }

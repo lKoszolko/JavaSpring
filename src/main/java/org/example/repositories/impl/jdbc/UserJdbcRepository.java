@@ -1,12 +1,12 @@
 package org.example.repositories.impl.jdbc;
 
-import org.example.db.JdbcConnectionManager;
 import org.example.models.Role;
 import org.example.models.User;
 import org.example.repositories.UserRepository;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
+import javax.sql.DataSource; // Zwróć uwagę na ten import!
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,17 +16,23 @@ import java.util.Optional;
 @Repository
 public class UserJdbcRepository implements UserRepository {
 
+    private final DataSource dataSource;
+
+    public UserJdbcRepository(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
+
     @Override
     public User save(User user) {
         String sql = """
-            INSERT INTO users (id, login, password, role) 
+            INSERT INTO users (id, login, password_hash, role) 
             VALUES (?, ?, ?, ?)
             ON CONFLICT (id) DO UPDATE SET 
                 login = EXCLUDED.login, 
-                password = EXCLUDED.password, 
+                password_hash = EXCLUDED.password_hash, 
                 role = EXCLUDED.role
             """;
-        try (Connection conn = JdbcConnectionManager.getInstance().getConnection();
+        try (Connection conn = dataSource.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, user.getId());
             pstmt.setString(2, user.getLogin());
@@ -51,7 +57,7 @@ public class UserJdbcRepository implements UserRepository {
 
     private Optional<User> findByColumn(String columnName, String value) {
         String sql = "SELECT * FROM users WHERE " + columnName + " = ?";
-        try (Connection conn = JdbcConnectionManager.getInstance().getConnection();
+        try (Connection conn = dataSource.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, value);
             ResultSet rs = pstmt.executeQuery();
@@ -59,7 +65,7 @@ public class UserJdbcRepository implements UserRepository {
                 return Optional.of(new User(
                         rs.getString("id"),
                         rs.getString("login"),
-                        rs.getString("password"),
+                        rs.getString("password_hash"),
                         Role.valueOf(rs.getString("role"))
                 ));
             }
@@ -73,14 +79,14 @@ public class UserJdbcRepository implements UserRepository {
     public List<User> findAll() {
         List<User> users = new ArrayList<>();
         String sql = "SELECT * FROM users";
-        try (Connection conn = JdbcConnectionManager.getInstance().getConnection();
+        try (Connection conn = dataSource.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
                 users.add(new User(
                         rs.getString("id"),
                         rs.getString("login"),
-                        rs.getString("password"),
+                        rs.getString("password_hash"),
                         Role.valueOf(rs.getString("role"))
                 ));
             }
@@ -102,7 +108,7 @@ public class UserJdbcRepository implements UserRepository {
 
     private void deleteByColumn(String columnName, String value) {
         String sql = "DELETE FROM users WHERE " + columnName + " = ?";
-        try (Connection conn = JdbcConnectionManager.getInstance().getConnection();
+        try (Connection conn = dataSource.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, value);
             pstmt.executeUpdate();
