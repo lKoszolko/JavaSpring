@@ -3,12 +3,13 @@ WORKDIR /app
 
 COPY pom.xml .
 COPY src ./src
+COPY *.json ./
 
 RUN mvn clean package -DskipTests
 
 FROM eclipse-temurin:17-jre-jammy
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
-COPY *.json ./
+COPY --from=builder /app/*.json ./
 EXPOSE 5000
 ENTRYPOINT ["java", "-jar", "app.jar", "--spring.profiles.active=adapter"]
