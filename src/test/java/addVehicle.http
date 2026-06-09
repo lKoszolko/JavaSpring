@@ -1,0 +1,7 @@
+POST car-rental-app-gehk.onrender.com/api/vehicles
+Content-Type: application/json
+Authorization: Bearer yJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiUk9MRV9BRE1JTiIsInN1YiI6ImFkbWluIiwiaWF0IjoxNzgxMDE0NDMyLCJleHAiOjE3ODEwMTgwMzJ9.qu-95U26xX37_WdD2EwzlnZRZyOhlNQMsCcg8CdRBkg
+
+{
+
+}

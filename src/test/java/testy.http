@@ -1,0 +1,14 @@
+POST https://car-rental-app-gehk.onrender.com/api/admin/vehicles
+Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiUk9MRV9BRE1JTiIsInN1YiI6ImFkbWluIiwiaWF0IjoxNzgxMDE2MjMwLCJleHAiOjE3ODEwMTk4MzB9.QaYvj-t77IhNNuB_KXUMV-FEWHw5sTF0Lnf8YVIqEho
+
+{
+  "model": "X5",
+  "attributes": "{}",
+  "brand": "BMW",
+  "category": "Car",
+  "plate": "LU12345",
+  "price": 100,
+  "year": 2020,
+  "id": "123"
+}

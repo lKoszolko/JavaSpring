@@ -1,7 +1,0 @@
-GET http://localhost:5000/api/rentals/users/b998d3f9-aeac-49af-a97d-12664efb23c2
-Authorization:Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiUk9MRV9VU0VSIiwic3ViIjoia293YWxza2kiLCJpYXQiOjE3ODAzOTI0MzcsImV4cCI6MTc4MDM5NjAzN30.jbBBGDz0N985vAI2k3nCL-rw6vnlvOUaU_u-HPAaUnI
-Content-Type: application/json
-
-{
-
-}

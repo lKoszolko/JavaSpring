@@ -2,7 +2,9 @@ package org.example.web;
 
 import org.example.models.Vehicle;
 import org.example.services.VehicleService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize; // <-- Pamiętaj o imporcie!
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,11 +29,14 @@ public class VehicleController {
         return vehicleService.findById(id);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
-    public Vehicle create(@RequestBody Vehicle vehicle) {
-        return vehicleService.addVehicle(vehicle);
+    public ResponseEntity<Vehicle> create(@RequestBody Vehicle vehicle) {
+        Vehicle savedVehicle = vehicleService.addVehicle(vehicle);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedVehicle);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable String id) {
         vehicleService.removeVehicle(id);
