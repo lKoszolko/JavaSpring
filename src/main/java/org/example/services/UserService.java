@@ -1,11 +1,15 @@
 package org.example.services;
 
+import org.example.models.Role;
 import org.example.models.User;
 import org.example.repositories.UserRepository;
 import org.example.services.servicesInterfaces.UserServiceInterface;
+import org.example.web.security.DTO;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
+
 @Service
 public class UserService implements UserServiceInterface {
     private final UserRepository userRepo;
@@ -34,5 +38,23 @@ public class UserService implements UserServiceInterface {
         }
         findById(idToDelete);
         userRepo.deleteById(idToDelete);
+    }
+
+    public void registerUser(DTO.RegisterRequest request){
+        if (!request.password().equals(request.matchingPassword())) {
+            throw new IllegalArgumentException("Podane hasła nie są takie same");
+        }
+
+        if (userRepo.findByLogin(request.login()).isPresent()) {
+            throw new IllegalArgumentException("Podany login już istnieje");
+        }
+        User newUser = new User();
+        newUser.setId(UUID.randomUUID().toString());
+        newUser.setLogin(request.login());
+        newUser.setPassword(request.password());
+        newUser.setRole(Role.USER);
+
+        userRepo.save(newUser);
+
     }
 }

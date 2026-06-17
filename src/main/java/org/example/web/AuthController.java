@@ -1,6 +1,9 @@
-package org.example.web.security;
+package org.example.web;
 
 import lombok.RequiredArgsConstructor;
+import org.example.services.UserService;
+import org.example.web.security.DTO;
+import org.example.web.security.JwtUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
+    private final UserService userService;
 
     @PostMapping("/login")
     public ResponseEntity<DTO.LoginResponse> login(
@@ -36,5 +40,17 @@ public class AuthController {
         UserDetails userDetails = (UserDetails) auth.getPrincipal();
         String token = jwtUtil.generateToken(userDetails);
         return ResponseEntity.ok(new DTO.LoginResponse(token));
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<String> register(@RequestBody DTO.RegisterRequest registerRequest){
+        try {
+            userService.registerUser(registerRequest);
+            return ResponseEntity.status(HttpStatus.CREATED).body("Pomyślnie zarejestrowano użytkownika");
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Błąd serwera podczas rejestracji");
+        }
     }
 }
