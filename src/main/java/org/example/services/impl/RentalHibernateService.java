@@ -8,7 +8,6 @@ import org.example.models.Vehicle;
 import org.example.repositories.RentalRepository;
 import org.example.repositories.UserRepository;
 import org.example.repositories.VehicleRepository;
-import org.example.services.PaymentService;
 import org.example.services.PaymentServiceInterface;
 import org.example.services.RentalServiceInterface;
 import org.springframework.stereotype.Service;

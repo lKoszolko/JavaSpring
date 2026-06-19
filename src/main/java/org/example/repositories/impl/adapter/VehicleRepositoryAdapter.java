@@ -11,24 +11,21 @@ import java.util.UUID;
 
 @Repository
 @Profile("adapter")
-public class VehicleRepositoryAdapter implements VehicleRepository {
+public class VehicleRepositoryAdapter {
     private final VehicleJpaDelegate delegate;
 
     public VehicleRepositoryAdapter(VehicleJpaDelegate delegate) {
         this.delegate = delegate;
     }
 
-    @Override
     public List<Vehicle> findAll() {
         return delegate.findAll();
     }
 
-    @Override
     public Optional<Vehicle> findById(String id) {
         return delegate.findById(id);
     }
 
-    @Override
     public Vehicle save(Vehicle vehicle) {
         if (vehicle.getId() == null || vehicle.getId().isBlank()) {
             vehicle.setId(UUID.randomUUID().toString());
@@ -36,7 +33,6 @@ public class VehicleRepositoryAdapter implements VehicleRepository {
         return delegate.save(vehicle);
     }
 
-    @Override
     public void deleteById(String id) {
         delegate.deleteById(id);
     }

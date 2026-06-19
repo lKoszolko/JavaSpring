@@ -32,7 +32,7 @@ public class DataBaseSeeder implements CommandLineRunner {
                     return;
                 }
 
-                List<CategoryConfig> categories = objectMapper.readValue(inputStream, new TypeReference<List<CategoryConfig>>(){});
+                List<CategoryConfig> categories = objectMapper.readValue(inputStream, new TypeReference<>() {});
 
                 repository.saveAll(categories);
                 System.out.println("✅ Pomyślnie wczytano " + categories.size() + " kategorii z pliku JSON do bazy danych!");

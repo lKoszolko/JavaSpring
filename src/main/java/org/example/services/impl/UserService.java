@@ -5,6 +5,7 @@ import org.example.models.User;
 import org.example.repositories.UserRepository;
 import org.example.services.UserServiceInterface;
 import org.example.web.security.DTO;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,10 +15,12 @@ import java.util.UUID;
 public class UserService implements UserServiceInterface {
     private final UserRepository userRepo;
     private final RentalHibernateService rentalService;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepo, RentalHibernateService rentalService) {
+    public UserService(UserRepository userRepo, RentalHibernateService rentalService, PasswordEncoder passwordEncoder) {
         this.userRepo = userRepo;
         this.rentalService = rentalService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public List<User> findAllUsers() {
@@ -51,8 +54,9 @@ public class UserService implements UserServiceInterface {
         User newUser = new User();
         newUser.setId(UUID.randomUUID().toString());
         newUser.setLogin(request.login());
-        newUser.setPassword(request.password());
+        newUser.setPassword(passwordEncoder.encode(request.password()));
         newUser.setRole(Role.USER);
+        newUser.setAddress(request.address());
 
         userRepo.save(newUser);
 

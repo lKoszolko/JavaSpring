@@ -2,15 +2,15 @@ package org.example.repositories;
 
 import org.example.models.User;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
-public interface UserRepository {
-    List<User> findAll();
-    Optional<User> findById(String id);
+
+@Repository
+@Profile({"jpa", "adapter"})
+public interface UserRepository extends JpaRepository<User, String> {
     Optional<User> findByLogin(String login);
-    User save(User user);
-    void deleteByLogin(String login);
-    void deleteById(String id);
+    List<User> findByAddress_City(String city);
 }
