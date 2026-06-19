@@ -1,10 +1,11 @@
 package org.example.web;
 
+import org.example.models.Coordinates;
 import org.example.models.Vehicle;
 import org.example.services.impl.VehicleService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize; // <-- Pamiętaj o imporcie!
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -42,4 +43,13 @@ public class VehicleController {
         vehicleService.removeVehicle(id);
         return ResponseEntity.noContent().build();
     }
+    @PutMapping("/{id}/location")
+    public ResponseEntity<String> updateLocation(@PathVariable String id, @RequestBody Coordinates coordinates){
+        Vehicle vehicle = vehicleService.findById(id);
+        vehicle.setCurrentLocation(coordinates);
+
+        vehicleService.addVehicle(vehicle);
+        return ResponseEntity.ok("Lokalizacja pojazdu zaktualizowana");
+    }
+
 }

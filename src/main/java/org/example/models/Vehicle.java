@@ -1,9 +1,6 @@
 package org.example.models;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -40,7 +37,10 @@ public class Vehicle {
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)
     @JdbcTypeCode(SqlTypes.JSON)
-    private Map<String, Object> attributes = new HashMap<>(); // <-- Inicjalizujemy od razu
+    private Map<String, Object> attributes = new HashMap<>();
+
+    @Embedded
+    private Coordinates currentLocation;
 
     @Builder
     public Vehicle(String id,

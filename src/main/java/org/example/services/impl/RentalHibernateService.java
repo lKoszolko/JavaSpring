@@ -26,14 +26,16 @@ public class RentalHibernateService implements RentalServiceInterface {
     private final VehicleRepository vehicleRepo;
     private final UserRepository userRepo;
     private final PaymentServiceInterface paymentService;
+    private final LocationValidationService locationValidationService;
 
     public RentalHibernateService(RentalRepository rentalRepo,
                                   VehicleRepository vehicleRepo,
-                                  UserRepository userRepo, PaymentService paymentService) {
+                                  UserRepository userRepo, PaymentService paymentService, LocationValidationService locationValidationService) {
         this.rentalRepo = rentalRepo;
         this.vehicleRepo = vehicleRepo;
         this.userRepo = userRepo;
         this.paymentService = paymentService;
+        this.locationValidationService = locationValidationService;
     }
 
     @Override
@@ -67,6 +69,10 @@ public class RentalHibernateService implements RentalServiceInterface {
     public String returnVehicle(String userId) throws StripeException {
         Rental rental = findActiveRentalByUserId(userId)
                 .orElseThrow(() -> new IllegalStateException("Nie masz aktualnie wypożyczonego pojazdu"));
+
+        if (!locationValidationService.isVehicleInAllowedZone(rental.getVehicle().getCurrentLocation())) {
+            throw new IllegalStateException("Nie można zwrócić pojazdu! Pojazd znajduje się poza dozwoloną strefą zwrotu.");
+        }
 
         rental.setReturnDateTime(LocalDateTime.now());
 
@@ -103,9 +109,9 @@ public class RentalHibernateService implements RentalServiceInterface {
         return findActiveRentalByUserId(userId).isPresent();
     }
 
+    //szukamy wolnych pojazdow za pomoca pola z klasy Vehicle isRented
     @Override
     public boolean vehicleHasActiveRental(String vehicleId) {
-        return rentalRepo.findAll().stream()
-                .anyMatch(r -> r.getVehicle().getId().equals(vehicleId) && r.getReturnDateTime() == null);
+        return vehicleRepo.findById(vehicleId).map(Vehicle::isRented).orElse(false);
     }
 }
