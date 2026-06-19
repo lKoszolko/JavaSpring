@@ -23,4 +23,4 @@ jwt:
 
 stripe:
   api:
-    key: ${STRIPE_API_KEY:sk_test_51RLkHqH55SekC08VBGRFZpHdPck1YoB0EtrscRAjblU6NC4pimDRkzSKLIakjU7D2KkBAIyPOHs8Ah85pv4Sqh4R00K8ScDOMC}
+    key: ${STRIPE_API_KEY}
