@@ -2,6 +2,11 @@ package org.example.models;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -12,6 +17,7 @@ import lombok.*;
 @ToString
 @Entity
 @Table(name = "users")
+@Data
 
 public class User {
     @Id
@@ -28,6 +34,8 @@ public class User {
     @Column(nullable = false)
     private Role role;
 
+    @Embedded
+    private Address address;
 
     public User copy() {
         return User.builder()
