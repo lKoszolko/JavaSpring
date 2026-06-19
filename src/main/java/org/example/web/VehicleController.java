@@ -1,7 +1,7 @@
 package org.example.web;
 
 import org.example.models.Vehicle;
-import org.example.services.VehicleService;
+import org.example.services.impl.VehicleService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize; // <-- Pamiętaj o imporcie!

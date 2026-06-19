@@ -2,6 +2,7 @@ package org.example.models;
 
 import jakarta.persistence.*;
 import lombok.*;
+import java.time.LocalDateTime; // <-- Nowy ważny import
 
 @Entity
 @Table(name = "rental")
@@ -23,10 +24,10 @@ public class Rental {
     private User user;
 
     @Column(name = "rent_date", nullable = false)
-    private String rentDateTime;
+    private LocalDateTime rentDateTime;
 
     @Column(name = "return_date")
-    private String returnDateTime;
+    private LocalDateTime returnDateTime;
 
     @Override
     public String toString() {

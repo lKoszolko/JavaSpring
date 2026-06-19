@@ -1,7 +1,7 @@
 package org.example.models;
 
 
-import org.example.services.VehicleCategoryConfigService;
+import org.example.services.impl.VehicleCategoryConfigService;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;

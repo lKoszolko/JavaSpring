@@ -1,7 +1,7 @@
 package org.example.web;
 
 import lombok.RequiredArgsConstructor;
-import org.example.services.UserService;
+import org.example.services.impl.UserService;
 import org.example.web.security.DTO;
 import org.example.web.security.JwtUtil;
 import org.springframework.http.HttpStatus;

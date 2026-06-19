@@ -1,9 +1,9 @@
-package org.example.services;
+package org.example.services.impl;
 
 import org.example.models.Role;
 import org.example.models.User;
 import org.example.repositories.UserRepository;
-import org.example.services.servicesInterfaces.AuthServiceInterface;
+import org.example.services.AuthServiceInterface;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.Optional;

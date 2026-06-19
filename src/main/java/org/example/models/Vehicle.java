@@ -35,6 +35,9 @@ public class Vehicle {
     private int year;
     private String plate;
 
+    @Column(name="is_rented", nullable = false)
+    private boolean rented;
+
     @Column(columnDefinition = "jsonb")
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)
@@ -57,6 +60,7 @@ public class Vehicle {
         this.year = year;
         this.plate = plate;
         this.price = price;
+        this.rented = false;
         this.attributes = attributes == null ? new HashMap<>() : new HashMap<>(attributes);
     }
 

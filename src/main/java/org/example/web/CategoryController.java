@@ -1,7 +1,7 @@
 package org.example.web;
 
 import org.example.models.CategoryConfig;
-import org.example.services.VehicleCategoryConfigService;
+import org.example.services.impl.VehicleCategoryConfigService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

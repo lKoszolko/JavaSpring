@@ -1,9 +1,10 @@
 package org.example.web;
 
+import com.stripe.exception.StripeException;
 import org.example.models.Rental;
 import org.example.models.User;
 import org.example.repositories.UserRepository;
-import org.example.services.servicesInterfaces.RentalServiceInterface;
+import org.example.services.RentalServiceInterface;
 import org.example.web.security.DTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/rentals")
@@ -49,19 +51,22 @@ public class RentalController {
     }
 
     @PostMapping("/return")
-    public ResponseEntity<Rental> returnVehicle(@AuthenticationPrincipal UserDetails userDetails) {
-
+    public ResponseEntity<?> returnVehicle(@AuthenticationPrincipal UserDetails userDetails) {
         String login = userDetails.getUsername();
         User user = userRepository.findByLogin(login)
                 .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono użytkownika"));
 
-        Rental rental = rentalService.returnVehicle(user.getId());
-        return ResponseEntity.ok(rental);
-    }
+        try {
+            String paymentUrl = rentalService.returnVehicle(user.getId());
 
-    @PostMapping("/test-roli")
-    public ResponseEntity<String> testRoli(@AuthenticationPrincipal UserDetails userDetails) {
-        System.out.println("Moje role to: " + userDetails.getAuthorities());
-        return ResponseEntity.ok("Zalogowany jako: " + userDetails.getUsername());
+            return ResponseEntity.ok(Map.of(
+                    "message", "Pojazd został zwrócony pomyślnie, opłać wypożyczenie pod wskazanym linkiem",
+                    "paymentUrl", paymentUrl
+            ));
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            return ResponseEntity.status(400).body(e.getMessage());
+        } catch (StripeException e) {
+            return ResponseEntity.status(500).body("Błąd komunikacji z operatorem płatności: " + e.getMessage());
+        }
     }
 }

@@ -1,5 +1,6 @@
-package org.example.services;
+package org.example.services.impl;
 
+import com.stripe.exception.StripeException;
 import org.example.models.Rental;
 import org.example.models.User;
 import org.example.models.Vehicle;
@@ -7,8 +8,11 @@ import org.example.models.Vehicle;
 import org.example.repositories.RentalRepository;
 import org.example.repositories.UserRepository;
 import org.example.repositories.VehicleRepository;
-import org.example.services.servicesInterfaces.RentalServiceInterface;
+import org.example.services.PaymentService;
+import org.example.services.PaymentServiceInterface;
+import org.example.services.RentalServiceInterface;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -16,18 +20,21 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Transactional
 @Service
 public class RentalHibernateService implements RentalServiceInterface {
     private final RentalRepository rentalRepo;
     private final VehicleRepository vehicleRepo;
     private final UserRepository userRepo;
+    private final PaymentServiceInterface paymentService;
 
     public RentalHibernateService(RentalRepository rentalRepo,
-                         VehicleRepository vehicleRepo,
-                         UserRepository userRepo) {
+                                  VehicleRepository vehicleRepo,
+                                  UserRepository userRepo, PaymentService paymentService) {
         this.rentalRepo = rentalRepo;
         this.vehicleRepo = vehicleRepo;
         this.userRepo = userRepo;
+        this.paymentService = paymentService;
     }
 
     @Override
@@ -50,20 +57,27 @@ public class RentalHibernateService implements RentalServiceInterface {
                 UUID.randomUUID().toString(),
                 vehicle,
                 user,
-                LocalDateTime.now().toString(),
+                LocalDateTime.now(),
                 null
         );
-
+        rental.getVehicle().setRented(true);
         return rentalRepo.save(rental);
     }
 
     @Override
-    public Rental returnVehicle(String userId) {
+    public String returnVehicle(String userId) throws StripeException {
         Rental rental = findActiveRentalByUserId(userId)
                 .orElseThrow(() -> new IllegalStateException("Nie masz aktualnie wypożyczonego pojazdu"));
 
-        rental.setReturnDateTime(LocalDateTime.now().toString());
-        return rentalRepo.save(rental);
+        rental.setReturnDateTime(LocalDateTime.now());
+
+        Vehicle vehicle = rental.getVehicle();
+        vehicle.setRented(false);
+
+        vehicleRepo.save(vehicle);
+        Rental updatedRental = rentalRepo.save(rental);
+
+        return paymentService.createStripeCheckoutSession(updatedRental);
     }
 
     @Override

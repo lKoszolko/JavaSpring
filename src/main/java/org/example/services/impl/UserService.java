@@ -1,9 +1,9 @@
-package org.example.services;
+package org.example.services.impl;
 
 import org.example.models.Role;
 import org.example.models.User;
 import org.example.repositories.UserRepository;
-import org.example.services.servicesInterfaces.UserServiceInterface;
+import org.example.services.UserServiceInterface;
 import org.example.web.security.DTO;
 import org.springframework.stereotype.Service;
 
@@ -13,9 +13,9 @@ import java.util.UUID;
 @Service
 public class UserService implements UserServiceInterface {
     private final UserRepository userRepo;
-    private final RentalService rentalService;
+    private final RentalHibernateService rentalService;
 
-    public UserService(UserRepository userRepo, RentalService rentalService) {
+    public UserService(UserRepository userRepo, RentalHibernateService rentalService) {
         this.userRepo = userRepo;
         this.rentalService = rentalService;
     }

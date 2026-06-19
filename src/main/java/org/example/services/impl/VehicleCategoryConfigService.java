@@ -1,7 +1,8 @@
-package org.example.services;
+package org.example.services.impl;
 
 import org.example.models.CategoryConfig;
 import org.example.repositories.VehicleCategoryConfigRepository;
+import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,7 +19,7 @@ public class VehicleCategoryConfigService {
     }
 
     public CategoryConfig getByCategory(String categoryName) {
-        CategoryConfig config = configRepository.findByName(categoryName);
+        CategoryConfig config = configRepository.findByCategory(categoryName);
         if (config == null) {
             throw new IllegalArgumentException("Nie znaleziono konfiguracji dla kategorii: " + categoryName);
         }
