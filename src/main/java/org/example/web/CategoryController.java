@@ -2,6 +2,7 @@ package org.example.web;
 
 import org.example.models.CategoryConfig;
 import org.example.services.impl.VehicleCategoryConfigService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,5 +25,15 @@ public class CategoryController {
     @GetMapping("/{category}")
     public CategoryConfig get(@PathVariable String category) {
         return categoryService.getByCategory(category);
+    }
+
+    @PostMapping
+    public ResponseEntity<?> addCategory(@RequestBody CategoryConfig categoryConfig) {
+        try {
+            CategoryConfig savedConfig = categoryService.createCategory(categoryConfig);
+            return ResponseEntity.ok(savedConfig);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }

@@ -35,12 +35,12 @@ public class VehicleValidator {
                 "Nieznana kategoria pojazdu: " + vehicle.getCategory());
 
         Map<String, Object> actualAttrs = vehicle.getAttributes();
-        Map<String, String> expectedAttrs = config.getAttributes();
+        Map<String, Object> expectedAttrs = config.getAttributes();
 
         if (expectedAttrs != null) {
-            for (Map.Entry<String, String> entry : expectedAttrs.entrySet()) {
+            for (Map.Entry<String, Object> entry : expectedAttrs.entrySet()) {
                 String expectedAttrName = entry.getKey();
-                String expectedAttrType = entry.getValue();
+                String expectedAttrType = entry.getValue().toString();
 
                 if (!actualAttrs.containsKey(expectedAttrName)) {
                     throw new IllegalArgumentException("Brak wymaganego atrybutu: " + expectedAttrName);

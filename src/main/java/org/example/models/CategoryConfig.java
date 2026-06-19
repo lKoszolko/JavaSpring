@@ -20,6 +20,6 @@ public class CategoryConfig {
     private String category;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    private Map<String, String> attributes;
+    private Map<String, Object> attributes;
 
 }

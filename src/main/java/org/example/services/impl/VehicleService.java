@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -17,11 +18,13 @@ public class VehicleService implements VehicleServiceInterface {
     private final VehicleRepository vehicleRepository;
     private final RentalHibernateService rentalService;
     private final VehicleValidator vehicleValidator;
+    private final JsonSchemaValidationService jsonValidator;
 
-    public VehicleService(VehicleRepository vehicleRepository, RentalHibernateService rentalService, VehicleValidator vehicleValidator) {
+    public VehicleService(VehicleRepository vehicleRepository, RentalHibernateService rentalService, VehicleValidator vehicleValidator, JsonSchemaValidationService jsonValidator) {
         this.vehicleRepository = vehicleRepository;
         this.rentalService = rentalService;
         this.vehicleValidator = vehicleValidator;
+        this.jsonValidator = jsonValidator;
     }
 
     public List<Vehicle> findAll() {
@@ -52,7 +55,15 @@ public class VehicleService implements VehicleServiceInterface {
         if(vehicle.getId() == null || vehicle.getId().trim().isEmpty()){
             vehicle.setId(UUID.randomUUID().toString());
         }
+
         vehicleValidator.validate(vehicle);
+
+        Set<String> errors = jsonValidator.validateAttributes(vehicle.getAttributes(), "category-schema.json");
+
+        if (!errors.isEmpty()) {
+            throw new IllegalArgumentException("Błędne atrybuty JSON pojazdu! Powód: " + String.join(", ", errors));
+        }
+
         return vehicleRepository.save(vehicle);
     }
 

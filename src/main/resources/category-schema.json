@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Vehicle Category Attributes Schema",
+  "type": "object",
+  "properties": {
+    "fuelType": {
+      "type": "string",
+      "description": "Rodzaj paliwa"
+    },
+    "licence": {
+      "type": "string",
+      "description": "A, B"
+    },
+    "seats": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 60
+    }
+  },
+  "additionalProperties": false
+}

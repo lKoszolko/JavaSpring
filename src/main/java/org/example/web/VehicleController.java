@@ -30,7 +30,7 @@ public class VehicleController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping
+    @PostMapping("/addVehicle")
     public ResponseEntity<Vehicle> create(@RequestBody Vehicle vehicle) {
         Vehicle savedVehicle = vehicleService.addVehicle(vehicle);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedVehicle);

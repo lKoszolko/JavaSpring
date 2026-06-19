@@ -1,9 +1,15 @@
-POST http://localhost:5000/api/auth/register
-Authorization: Bearer
+POST http://localhost:5000/api/vehicles/addVehicle
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiUk9MRV9BRE1JTiIsInN1YiI6Imx1a2FzeiIsImlhdCI6MTc4MTg3OTU2MSwiZXhwIjoxNzgxODgzMTYxfQ.rgb9F5MnV2GWC-wxYTp1TsmjSJ5rXmBTj8RG2Gf71u8
 Content-Type: application/json
 
 {
-  "login": "user",
-  "password": "user123",
-  "matchingPassword": "user123"
+  "category": "Car",
+  "brand": "Toyota01",
+  "model": "Corolla01",
+  "year": 2000,
+  "plate": "LU000",
+  "price": 150.0,
+  "attributes": {
+    "fuelType":"hybrid"
+  }
 }

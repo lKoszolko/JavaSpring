@@ -8,7 +8,6 @@ import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,7 +18,6 @@ import java.util.Map;
 @ToString
 @Entity
 @Table(name = "vehicle")
-
 public class Vehicle {
 
     @Id
@@ -42,7 +40,7 @@ public class Vehicle {
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)
     @JdbcTypeCode(SqlTypes.JSON)
-    private Map<String, Object> attributes = new HashMap<>();
+    private Map<String, Object> attributes = new HashMap<>(); // <-- Inicjalizujemy od razu
 
     @Builder
     public Vehicle(String id,
@@ -68,7 +66,7 @@ public class Vehicle {
         if (this.attributes == null) {
             this.attributes = new HashMap<>();
         }
-        return Collections.unmodifiableMap(this.attributes);
+        return this.attributes;
     }
 
     public Object getAttribute(String key) {
