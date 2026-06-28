@@ -5,8 +5,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class LocationValidationService {
-    private static final double HQ_LAT = 52.2297;
-    private static final double HQ_LON = 21.0122;
+    private static final double HQ_LAT = 51.2511;
+    private static final double HQ_LON = 22.5750;
 
     private static final double ALLOWED_RADIUS_METERS = 500.0;
     private static final int EARTH_RADIUS_KM = 6371;

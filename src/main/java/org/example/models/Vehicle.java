@@ -40,7 +40,7 @@ public class Vehicle {
     private Map<String, Object> attributes = new HashMap<>();
 
     @Embedded
-    private Coordinates currentLocation;
+    private Coordinates currentLocation = new Coordinates(51.2511,  22.5750);
 
     @Builder
     public Vehicle(String id,
@@ -50,6 +50,7 @@ public class Vehicle {
                    int year,
                    String plate,
                    double price,
+                   Coordinates currentLocation,
                    Map<String, Object> attributes) {
         this.id = id;
         this.category = category;
@@ -59,6 +60,7 @@ public class Vehicle {
         this.plate = plate;
         this.price = price;
         this.rented = false;
+        this.currentLocation = currentLocation;
         this.attributes = attributes == null ? new HashMap<>() : new HashMap<>(attributes);
     }
 
