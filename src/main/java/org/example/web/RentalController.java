@@ -60,7 +60,7 @@ public class RentalController {
             String paymentUrl = rentalService.returnVehicle(user.getId());
 
             return ResponseEntity.ok(Map.of(
-                    "message", "Pojazd został zwrócony pomyślnie, opłać wypożyczenie pod wskazanym linkiem",
+                    "message", "Opłać wypożyczenie pod wskazanym linkiem, aby zwrócić pojazd",
                     "paymentUrl", paymentUrl
             ));
         } catch (IllegalArgumentException | IllegalStateException e) {

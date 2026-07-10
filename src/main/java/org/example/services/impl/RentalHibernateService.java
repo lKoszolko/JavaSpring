@@ -71,7 +71,18 @@ public class RentalHibernateService implements RentalServiceInterface {
                 .orElseThrow(() -> new IllegalStateException("Nie masz aktualnie wypożyczonego pojazdu"));
 
         if (!locationValidationService.isVehicleInAllowedZone(rental.getVehicle().getCurrentLocation())) {
-            throw new IllegalStateException("Nie można zwrócić pojazdu! Pojazd znajduje się poza dozwoloną strefą zwrotu.");
+            throw new IllegalStateException("Nie można zwrócić pojazdu! Pojazd znajduje się poza dozwolaną strefą zwrotu.");
+        }
+
+        return paymentService.createStripeCheckoutSession(rental);
+    }
+
+    public void finalizeReturnAfterPayment(String rentalId) {
+        Rental rental = rentalRepo.findById(rentalId)
+                .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono wypożyczenia o ID: " + rentalId));
+
+        if (rental.getReturnDateTime() != null) {
+            return;
         }
 
         rental.setReturnDateTime(LocalDateTime.now());
@@ -80,9 +91,8 @@ public class RentalHibernateService implements RentalServiceInterface {
         vehicle.setRented(false);
 
         vehicleRepo.save(vehicle);
-        Rental updatedRental = rentalRepo.save(rental);
-
-        return paymentService.createStripeCheckoutSession(updatedRental);
+        rentalRepo.save(rental);
+        System.out.println("💳 [Stripe Success] Płatność zakończona. Pojazd " + vehicle.getId() + " został pomyślnie zwrócony!");
     }
 
     @Override

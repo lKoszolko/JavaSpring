@@ -36,11 +36,13 @@ public class PaymentService implements PaymentServiceInterface {
         LocalDateTime start = rental.getRentDateTime();
         LocalDateTime end = rental.getReturnDateTime();
 
-        if (end == null) {
-            throw new IllegalStateException("Nie można obliczyć kosztu dla pojazdu, który nie został jeszcze zwrócony!");
+        LocalDateTime endTime = rental.getReturnDateTime();
+
+        if (endTime == null) {
+            endTime = LocalDateTime.now();
         }
 
-        long totalDays = calculateTotalDays(start, end);
+        long totalDays = calculateTotalDays(start, endTime);
 
         if (totalDays == 0) {
             totalDays = 1;
